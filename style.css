@@ -8,7 +8,7 @@ body{
     display: grid;
     height: 100%;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: 7% auto;
+    grid-template-rows: 7% 85%;
     column-gap: 20px;
 
 }
@@ -78,13 +78,28 @@ nav {
     object-fit: contain; 
 }
 
-.container {
+.song-container {
     position: relative;
     width: auto;
     height: auto;
     gap: 20px;
     align-items: center;
     justify-content: center;
+}
+
+.dj-container {
+    width: 350px;
+    height: 350px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 6px 2px;
+    padding: 0; 
+    overflow: hidden;
+    position: relative;
 }
 
 
@@ -106,7 +121,11 @@ nav {
     
 }
 
-.container:hover .overlay {
+.song-container:hover .overlay {
+    opacity: 10;
+}
+
+.dj-container:hover .overlay {
     opacity: 10;
 }
 
@@ -150,17 +169,33 @@ nav {
     background-color: #586569;
     grid-column: 2 / 6;
     border-radius: 25px;
+    display: grid;
+    grid-template-rows: 50% 50%;
 }
 
-.scroll {
+.scroll-songs {
+    grid-row: 1/2;
     border-radius: 25px;
     background-color: #586569;
     text-align: center;
     display: grid;
     grid-column-gap: 20px;
     grid-row-gap: 10px;
-    grid-template-columns: repeat(6, 0.5fr);
-    grid-template-rows: 2fr 2fr;
+    grid-template-columns: repeat(5, 0.5fr);
+    grid-template-rows: 2fr;
+    overflow: auto;
+    margin: 20px;
+  }
+
+  .scroll-djs {
+    border-radius: 25px;
+    background-color: #586569;
+    text-align: center;
+    display: grid;
+    grid-column-gap: 20px;
+    grid-row-gap: 10px;
+    grid-template-columns: repeat(5, 0.5fr);
+    grid-template-rows: 2fr;
     overflow: auto;
     margin: 20px;
   }
