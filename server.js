@@ -12,14 +12,12 @@ app.use('/media', express.static(__dirname + 'public/media'));
 app.set('views', './views');
 app.set('view engine', 'ejs');
 
-// use res.render to load up an ejs view file
-
-// index page
+// index Page
 app.get('/', function(req, res) {
   res.render('pages/ProducerPage');
 });
 
-// about page
+// dj Playlist Page
 app.get('/djPlaylist', function(req, res) {
   res.render('pages/djPlaylist');
 });
