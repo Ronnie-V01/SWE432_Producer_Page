@@ -13,13 +13,19 @@ app.set('views', './views');
 app.set('view engine', 'ejs');
 
 // index Page
+// Uses Title and cssFile vars to change the necessary dynamic values when rendered
 app.get('/', function(req, res) {
-  res.render('pages/ProducerPage');
+  const title = 'Producer Home Screen';
+  const cssFile = '/css/style.css';
+  res.render('pages/ProducerPage', {title, cssFile});
 });
 
 // dj Playlist Page
+// Uses Title and cssFile vars to change the necessary dynamic values when rendered
 app.get('/djPlaylist', function(req, res) {
-  res.render('pages/djPlaylist');
+  const title = 'DJ Playlist Screen';
+  const cssFile = '/css/dj.css';
+  res.render('pages/djPlaylist', {title, cssFile});
 });
 
 app.listen(8080);
