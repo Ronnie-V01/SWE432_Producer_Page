@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Producer Home Screen</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="images/logo.png">
+  </head>
+  
+  <body style="background-color: powderblue;">
+
+    <!-- Reused html stored in partials -->
+    <div class="navigation">     
+        <%- include('../partials/navbar'); %>
+    </div> 
+
+    <!-- Reused html stored in partials -->
+    <div class="box" >
+        <%- include('../partials/searchbar'); %>
+    </div>
+
+    <div class="scroll-container">
+
+        <div class="scroll-songs">
+        
+            <div class="song-container">
+                <a href="/">
+                    <img src="images/mitski.png" width="350px">
+                    <figcaption>Puberty 2</figcaption>
+                    <div class="overlay">Mitski: Puberty 2
+                        <audio controls src="media/iBetOnLosingDogs.mp3">
+                            <a href="media/iBetOnLosingDogs.mp3"></a>
+                        </audio>
+                    </div>
+                </a>
+            </div>
+        
+        
+            <div class="song-container">
+                <a href="/">
+                    <img src="images/humbug.png" width="350px"> 
+                    <figcaption>Humbug</figcaption>
+                    <div class="overlay">Arctic Monkeys: Humbug
+                        <audio controls src="media/cornerstone.m4a">
+                            <a href="media/cornerstone.m4a"></a>
+                        </audio>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="song-container">
+                <a href="/">
+                    <img src="images/billie.png" width="350">
+                    <figcaption>Where Do We Go When We Fall Asleep?</figcaption>
+                    <div class="overlay">Billie Eilish: Where Do We Go When We Fall Asleep?
+                        <audio controls src="media/11 ilomilo.m4a">
+                            <a href="media/11 ilomilo.m4a"></a>
+                        </audio>
+                    </div>
+                </a>
+            </div>
+        
+            <div class="song-container">
+                <a href="/">
+                    <img src="images/wiped out.png" width="350"> 
+                    <figcaption>Wiped Out!</figcaption>
+                    <div class="overlay">The Neighbourhood: Wiped Out!
+                        <audio controls src="media/07 Baby Came Home 2 _ Valentines.m4a">
+                            <a href="media/07 Baby Came Home 2 _ Valentines.m4a"></a>
+                        </audio>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Scrollable selection for different djs-->
+        
+        <div class="scroll-djs">
+        
+            <div class="dj-container">
+                <a href="/djPlaylist">
+                    <img src="images/mitskiPFP.jpg" width="350px">
+                    <figcaption>Mitski</figcaption>
+                    <div class="overlay">Mitski</div>
+                </a>
+            </div>
+        
+        
+            <div class="dj-container">
+                <a href="/djPlaylist">
+                    <img src="images/monkeysPFP.jpg" width=350px> 
+                    <figcaption>Arctic Monkeys</figcaption>
+                    <div class="overlay">Arctic Monkeys</div>
+                </a>
+            </div>
+            
+            <div class="dj-container">
+                <a href="/djPlaylist">
+                    <img src="images/devLemonsPFP.jpg" width="350px">
+                    <figcaption>Dev Lemons</figcaption>
+                    <div class="overlay">Dev Lemons</div>
+                </a>
+            </div>
+        
+            <div class="dj-container">
+                <a href="/djPlaylist">
+                    <img src="images/nbhdPFP.jpg" width="350px"> 
+                    <figcaption>The Neighbourhood</figcaption>
+                    <div class="overlay">The Neighbourhood</div>
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+    
+  </body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>dj edit Screen</title>
+    <link rel="stylesheet" href="css/dj.css">
+    <link rel="icon" type="image/png" href="images/logo.png">
+  </head>
+  
+  <body style="background-color: powderblue;">
+    
+    <!-- Reused html stored in partials -->
+    <div class="navigation">
+        <%- include('../partials/navbar'); %>
+    </div> 
+
+    <!-- Reused html stored in partials -->
+    <div class="box" >      
+        <%- include('../partials/searchbar'); %>
+    </div>
+
+    <div class="djWorkspace-container">
+
+        <div class="djProfile-container">
+                <img src="images/mitskiPFP.jpg">
+        </div>
+
+        <div class="djInfo">
+            <p>DJ Mitski</p>        
+        </div>
+
+        <div class="playlist-container">
+
+            <div class="playlist">
+                <div class="song-container" id="song1">Add Song</div>
+                <div class="song-container" id="song2">Add Song</div>
+                <div class="song-container" id="song3">Add Song</div>
+                <div class="song-container" id="song4">Add Song</div>
+                <div class="song-container" id="song5">Add Song</div>
+                <div class="song-container" id="song6">Add Song</div>
+            </div>
+
+        </div>
+
+        <form class="addPopup" id="addPopup" onsubmit="return addValidate()">
+        
+        
+            <p class="AddInput">Enter a Song to Add
+                <input id="addSong" placeholder="Enter a song"
+                    type="text"/>
+            </p>
+
+            <button type="submit" id="add">Add</button>
+            <button id="cancelAdd">Cancel</button>
+        </form>
+
+        
+        <form class="removePopup" id="removePopup" onsubmit="return remValidate()">
+        
+        
+            <p class="remInput">Enter a Song to Remove
+                <input id="remSong" placeholder="Enter a song"
+                    type="text"/>
+            </p>
+
+            <button type="submit" id="remove">Remove</button>
+            <button id="cancelRemove">Cancel</button>
+        </form>
+
+        <div class="player-container">
+
+            <p class="playing" id="currPlaying">Now Playing:</p>
+
+            <div class="player-button-container">
+                <button class="player-button" id="lastSong" onClick="playLast()">&#x23EE</button>
+                <button class="player-button" id="playPause" onClick="playPause()">&#x23F5</button>
+                <button class="player-button" id="nextSong" onClick="playNext()">&#x23ED</button>
+            </div>
+
+            <div class="player">
+                <audio class="music-player" id="audio" controls="audioControls">
+                    <source id="audioSource" src="#"></source>
+                </audio>
+            </div>
+
+        </div>
+
+        <div class="playlist-functions-container">
+
+            <button class="function-button" id="addButton">Add Song</button>
+
+            <button class="function-button" id="removeButton">Remove Song</button>
+        </div>
+
+    </div>
+    
+    <script src="javascript/djPlaylist.js"></script>
+  </body>
+</html>
