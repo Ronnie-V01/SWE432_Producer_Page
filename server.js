@@ -1,4 +1,5 @@
 var express = require('express');
+// Session inclusion
 var session = require('express-session');
 var app = express();
 
@@ -8,6 +9,8 @@ const parser = require('body-parser');
 // body parser
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
+
+// Attempt at creating a session model
 app.use(session({
   secret: 'secret-key',
   resave: false,
@@ -21,9 +24,8 @@ var songData = require('./models/songData');
 var playlists = require('./models/playlists');
 
 var db;
-var totalSongs;
-var songTitles;
 
+// Const db url connection
 const url = 'mongodb://127.0.0.1:27017/testWeb';
 
 // Static Files
@@ -41,11 +43,13 @@ app.set('view engine', 'ejs');
 const main = async() => {
   try{
 
+    // Create connection
     await mongoose.connect(url);
     db = mongoose.connection;
 
     console.log('connected to db');
 
+    // Check if db is filled, if not fill it, with necessary info
     var currSongData = await songData.find({});
     var currPlaylist = await playlists.find({});
 
@@ -62,6 +66,8 @@ const main = async() => {
                       {title: 'Ilomilo', artist: 'Billie Eilish', songSrc: './media/11 ilomilo.m4a'},
                       {title: 'Cornerstone', artist: 'Arctic Monkeys', songSrc: './media/cornerstone.m4a'}
                     ];
+
+      // CREATE Song Entries to fill db
       for(let i = 0; i < songs.length; i++){
 
         const newEntry = {
@@ -80,6 +86,7 @@ const main = async() => {
       }
     }
 
+    // CREATE a sample playlist entry to test functionality
     if(currPlaylist.length == 0){
 
       const newEntry = {
@@ -103,37 +110,53 @@ const main = async() => {
   }
 };
 
-// calls function for the startup of the db conection
+// calls main function for the startup of the db conection
 main();
 
 
+// add's a song to a playlist, and UPDATES the playlist accordingly
 app.post('/getSong', async (req, res) => {
 
   try{
+
+    // Retrieve req body fields necessary for query
     const { songTitle } = req.body;
     const { djOwner } = req.body
     console.log({songTitle});
 
+    // Check if song exists in db
     const song = await songData.findOne({title:songTitle});
 
+    // If song exists
     if(song){
 
+      // Check if playlist exists
       const playlist = await playlists.findOne({djOwner: djOwner});
+
+      // If playlist exists
       if(playlist){
+
+
         const newTotalSongs = playlist.totalSongs + 1;
+
+        // UPDATE Condition
         const condition = {djOwner: djOwner};
+        // UPDATE Query, pushes new song onto array of songs
         const update = {
           $push: {
             songs: song,
           },
 
+          // UPDATES the total number of songs
           $set: {
             totalSongs: newTotalSongs,
           },
         }
 
-        if(playlist || playlist.totalSongs < 6){
+        // IF playlist is not full and exists
+        if(playlist.totalSongs < 6){
 
+          // Send UPDATE query
           playlists.updateOne(condition, update)
           .then(result =>{
             res.json({success: true, song});
@@ -142,6 +165,7 @@ app.post('/getSong', async (req, res) => {
             res.status(404).json({success: false, message: 'Failed to update'});
           })
         }
+        // IF playlist is full send fail, with err message to alert user
         else{
           res.json({success: false, message: 'Not enough room for new songs'});
         }
@@ -150,6 +174,7 @@ app.post('/getSong', async (req, res) => {
         res.status(404).json({success: false, message: 'Playlist could not be found'});
       }
     }
+    // Alert user that the song is not in the db
     else{
       res.status(404).json({success: false, message: 'Song could not be found'});
     }
@@ -161,30 +186,39 @@ app.post('/getSong', async (req, res) => {
 })
 
 
+// REMOVE Song from playlist
 app.post('/removeSong', async (req, res) => {
 
   try{
+    // Similar to Add song, get req body for query
     const { songTitle } = req.body;
     const { djOwner } = req.body
     console.log(songTitle);
     const song = await songData.findOne({title: songTitle});
 
+    // Find playlist to edit
     await playlists.findOne({djOwner: djOwner})
     .then(doc =>{
 
+      // When found, find first index of song to be removed, and remove it from the array
       if(doc){
         console.log(song);
         const index = doc.songs.findIndex(song => song.title == songTitle);
 
+        // If there are no songs to remove in the playlist, alert the user via message
         if(doc.totalSongs == 0){
           res.status(404).json({success: false, message:'No songs to remove in playlist'});
         }
+        // IF song exists and can be removed
         else if(index != -1){
           doc.totalSongs = doc.totalSongs - 1;
           doc.songs.splice(index, 1);
+
+          // Save changes, and return the playlist, and index for dom manipulation
           doc.save();
           res.json({success: true, doc, index});
         }
+        // IF song is not in the playlist, alert the user via message
         else{
           res.status(404).json({success: false, message:'Song is not currently in the playlist'});
         }
@@ -201,6 +235,7 @@ app.post('/removeSong', async (req, res) => {
   }
 })
 
+//for dom manipulation, get playlist, and send to req
 app.post('/getUpdate', async (req, res) => {
 
   try{
@@ -221,29 +256,30 @@ app.post('/getUpdate', async (req, res) => {
   }
 })
 
+// ATTEMPT at a login, redirects, upon session username enter
 app.post('/login', (req, res)=>{
   req.session.username = req.body.username;
   res.redirect('/homepage');
 })
 
+// Start page
 app.get('/', function(req, res){
   res.render('pages/login');
 })
 
-// index page
+// Producer page, passes title and cssFile as passed in ejs variables 
 app.get('/homepage', function(req, res) {
   const title = 'Producer Home Screen';
   const cssFile = '/css/style.css';
   res.render('pages/ProducerPage',{title, cssFile});
 });
 
-// about page
+// dj Playlist page, passes in previous ejs variables, and new db doc, for static and dynamic variable creation
 app.get('/djPlaylist', async function(req, res) {
   var playlist = await playlists.findOne({djOwner: 'Mitski'});
   const title = 'DJ Playlist Screen';
   const cssFile = '/css/dj.css';
 
-  /*console.log(playlist.songs[0]);*/
   res.render('pages/djPlaylist',{
     title,
     cssFile,

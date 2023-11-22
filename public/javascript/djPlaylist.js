@@ -6,15 +6,19 @@ var currSong = 0;
 // Add Song
 async function addSong(title){
 
+    // determine which dj's playlist we need
     let dj = document.getElementById("djTag").innerHTML;
 
     try{
         console.log(title);
+
+        // Fetch the getSong post
         const response = fetch('/getSong', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
+            // Pass in necessary vals for query
             body: JSON.stringify({
                 songTitle: title,
                 djOwner: dj
@@ -25,10 +29,12 @@ async function addSong(title){
         .then(data => {
             console.log('Server Response', data);
 
+            // IF unsuccessful alert user with appropriate message
             if(!data.success){
                 console.log(data.message);
                 alert(data.message);
             }
+            // Otherwise update dom to reflect backend
             else{
                 updateDOM();  
             }
@@ -47,6 +53,7 @@ async function addSong(title){
 function removeSong(title){
 
     let dj = document.getElementById("djTag").innerHTML;
+    // Fetch removeSong post
     try{
         console.log(title);
         const response = fetch('/removeSong', {
@@ -54,6 +61,7 @@ function removeSong(title){
             headers: {
                 'Content-Type': 'application/json',
             },
+            // Necessary query vals
             body: JSON.stringify({
                 songTitle: title,
                 djOwner: dj
@@ -64,13 +72,18 @@ function removeSong(title){
         .then(data => {
             console.log('Server Response', data);
 
+            // IF unsuccessful, alert user with appropriate message
             if(!data.success){
                 console.log(data.message);
                 alert(data.message);
             }
+            // IF successful update dom to reflect backend
             else{
                 updateDOM();
             
+                // Update player and global song pointer using the backend to determine
+                // If a song change is necessary upon deletion
+                // IF last song was deleted 
                 if(data.doc.totalSongs <= 0){
                     audioSource.src = "#";
                     audioPlay.load();
@@ -78,6 +91,7 @@ function removeSong(title){
                     currSong = 0;
                     updatePlayText();
                 }
+                //IF song that was currently playing is deleted
                 else if(currSong == data.index){
                     --currSong;
                     playNext();
@@ -97,6 +111,8 @@ function removeSong(title){
 function updateDOM(){
 
     let dj = document.getElementById("djTag").innerHTML;
+
+    // Retrieves the playlist to reflect backend changes to frontend
     try{
         const response = fetch('/getUpdate', {
             method: 'POST',
@@ -112,6 +128,8 @@ function updateDOM(){
         .then(data => {
             console.log('Server Response', data);
 
+            // Checks each field, to see if an item exists, if so, update dom to reflect these changes
+            // If not, set dom to default display
             if(data.success){
                 let playlist = data.playlist.songs;
                 document.getElementById('song1').innerHTML = playlist[0] ? (playlist[0].title + ' - ' + playlist[0].artist) : 'Add song';
@@ -206,6 +224,7 @@ function remValidate(){
 var audioPlay = document.getElementById("audio");
 var audioSource = document.getElementById("audioSource");
 
+// Retrieve playlist to update dom and reflect backend changes
 function updatePlayText(){
 
     let dj = document.getElementById("djTag").innerHTML;
@@ -224,6 +243,7 @@ function updatePlayText(){
         .then(data => {
             console.log('Server Response', data);
 
+            // IF successful, update 'currently playing' box accordingly
             if(data.success){
                 const playlist = data.playlist.songs;
                 var playText = document.getElementById("currPlaying");
@@ -250,6 +270,7 @@ function updatePlayText(){
 
 }
 
+// Retrieve playlist, to update player according to backend
 function playPause(){
 
     let dj = document.getElementById("djTag").innerHTML;
@@ -268,6 +289,8 @@ function playPause(){
         .then(data => {
             console.log('Server Response', data);
 
+            // Play the song currently in queue to play, determine what song it is using the db
+            // index of the song in the playlist
             if(data.success){
 
                 const playlist = data.playlist.songs;
@@ -302,7 +325,7 @@ function playPause(){
         console.error('Fetching Error2:', error);
     }
 }
-
+// Retrieve playlist to alter player according to the backend
 function playNext(){
     
     let dj = document.getElementById("djTag").innerHTML;
@@ -360,6 +383,7 @@ function playNext(){
     }
 }
 
+// Retrieve playlist to alter player according to the backend
 function playLast(){
 
     let dj = document.getElementById("djTag").innerHTML;
