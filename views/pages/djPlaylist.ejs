@@ -8,7 +8,7 @@
   
   <body style="background-color: powderblue;">
     
-    <!-- Reused Navbar stored in partials -->
+    <!-- Reused NavBar stored in partials -->
     <div class="navigation">
         <%- include('../partials/navbar'); %>
     </div> 
@@ -20,23 +20,25 @@
 
     <div class="djWorkspace-container">
 
+        <!-- Static UI component display -->
         <div class="djProfile-container">
-                <img src="images/mitskiPFP.jpg">
+                <img src="<%= playlist.imgSrc %>">
         </div>
 
         <div class="djInfo">
-            <p>DJ Mitski</p>        
+            <p id="djTag">Mitski</p>        
         </div>
 
+        <!-- dynamic UI component display-->
         <div class="playlist-container">
 
             <div class="playlist">
-                <div class="song-container" id="song1">Add Song</div>
-                <div class="song-container" id="song2">Add Song</div>
-                <div class="song-container" id="song3">Add Song</div>
-                <div class="song-container" id="song4">Add Song</div>
-                <div class="song-container" id="song5">Add Song</div>
-                <div class="song-container" id="song6">Add Song</div>
+                <div class="song-container" id="song1"><%= typeof playlist.songs[0] !== 'undefined' ?  (playlist.songs[0].title + ' - ' + playlist.songs[0].artist) : 'Add Song' %></div>
+                <div class="song-container" id="song2"><%= typeof playlist.songs[1] !== 'undefined' ?  (playlist.songs[1].title + ' - ' + playlist.songs[1].artist) : 'Add Song' %></div>
+                <div class="song-container" id="song3"><%= typeof playlist.songs[2] !== 'undefined' ?  (playlist.songs[2].title + ' - ' + playlist.songs[2].artist) : 'Add Song' %></div>
+                <div class="song-container" id="song4"><%= typeof playlist.songs[3] !== 'undefined' ?  (playlist.songs[3].title + ' - ' + playlist.songs[3].artist) : 'Add Song' %></div>
+                <div class="song-container" id="song5"><%= typeof playlist.songs[4] !== 'undefined' ?  (playlist.songs[4].title + ' - ' + playlist.songs[4].artist) : 'Add Song' %></div>
+                <div class="song-container" id="song6"><%= typeof playlist.songs[5] !== 'undefined' ?  (playlist.songs[5].title + ' - ' + playlist.songs[5].artist) : 'Add Song' %></div>
             </div>
 
         </div>

@@ -1,158 +1,135 @@
 /* The Javascript file for */
-class Song{
 
-    constructor(title, artist, src){
-        this.title = title;
-        this.artist = artist;
-        this.src = src;
-    }
-}
+var currSong = 0;
 
-var iBetOnLosingDogs = new Song('I Bet On Losing Dogs', 'Mitski', './media/iBetOnLosingDogs.mp3');
-var fadeIntoYou = new Song('Fade Into You', 'Mazzy Star', './media/01 Fade into You.m4a');
-var cheers = new Song('Cheers', 'Faye Webster', './media/06 Cheers.m4a');
-var thinkAboutIt = new Song('Think About It', 'Dev Lemons', './media/06 Think About It.m4a');
-var babyCameHome = new Song('Baby Came Home 2', 'The Neighbourhood', './media/07 Baby Came Home 2 _ Valentines.m4a');
-var myLoveMineAllMine = new Song('My Love Mine All Mine', 'Mitski', './media/07 My Love Mine All Mine.m4a');
-var thunder = new Song('Thunder', 'Lana Del Rey','./media/10 thunder.m4a');
-var ilomilo = new Song('Ilomilo', 'Billie Eilish', './media/11 ilomilo.m4a');
-var cornerstone = new Song('Cornerstone', 'Arctic Monkeys', './media/cornerstone.m4a');
-
-var nullSong = new Song('Null', 'Null', 'Null');
-
-let allSongs = [iBetOnLosingDogs, fadeIntoYou, cheers, thinkAboutIt, babyCameHome, myLoveMineAllMine, thunder, ilomilo, cornerstone];
-
-let player = {
-    playlist : Array.apply(null, Array(6)),
-    status : "paused",
-    playlistSize : 0,
-    currSong : 0
-};
-
-function printSongName(item){
-
-    if(item !== undefined){
-      let name = item.title;
-       console.log(name);
-    }
-};
-
-allSongs.forEach(printSongName);
 
 // Add Song
-function addSong(title){
+async function addSong(title){
 
-    let songFindResult = allSongs.find((Song) => Song.title == title);
+    let dj = document.getElementById("djTag").innerHTML;
 
-    if(songFindResult === undefined){
-        console.log('Song could not be found');
-        alert('Song could not be found');
+    try{
+        console.log(title);
+        const response = fetch('/getSong', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                songTitle: title,
+                djOwner: dj
+            }),
+
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Server Response', data);
+
+            if(!data.success){
+                console.log(data.message);
+                alert(data.message);
+            }
+            else{
+                updateDOM();  
+            }
+        })
+        .catch(error => {
+            console.error('Fetch Error1', error);
+        })
     }
-    else if(player.playlistSize >= 6){
-        console.log('Not enough room for new songs');
-        alert('Not enough room for new songs');
+    catch(error){
+        console.error('Fetching Error2:', error);
     }
-    else{
-        player.playlist.splice(player.playlistSize, 0, songFindResult);
-        ++player.playlistSize;
-    }
+
 };
-
-
-console.log(player.playlistSize);
-player.playlist.forEach(printSongName);
 
 // Remove Song
 function removeSong(title){
 
-    
-    let songFindResult = player.playlist.find((Song) => {
-        if(Song != undefined){
-            return Song.title == title;
-        }
-        return undefined;
-    });
+    let dj = document.getElementById("djTag").innerHTML;
+    try{
+        console.log(title);
+        const response = fetch('/removeSong', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                songTitle: title,
+                djOwner: dj
+            }),
 
-    let songRemoved = 0;
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Server Response', data);
 
-    if(player.playlistSize <= 0){
-        console.log('There are no songs to remove in the current playlist'); 
-        alert('There are no songs to remove in the current playlist');
-               
-    }
-    else if(songFindResult === undefined){
-        console.log('Song is not in the current playlist');
-        alert('Song is not in the current playlist');
-        
-    }
-    else{
-
-        
-        for(let index = 0; index < player.playlistSize; index++){
-
-            if(player.playlist[index].title === title && !songRemoved){
-
-                if(player.currSong === index){
+            if(!data.success){
+                console.log(data.message);
+                alert(data.message);
+            }
+            else{
+                updateDOM();
+            
+                if(data.doc.totalSongs <= 0){
+                    audioSource.src = "#";
+                    audioPlay.load();
+                    document.getElementById("playPause").innerHTML="&#x23F5";
+                    currSong = 0;
+                    updatePlayText();
+                }
+                else if(currSong == data.index){
+                    --currSong;
                     playNext();
                 }
-
-                player.playlist[index] = undefined;
-                songRemoved = 1;
-                
             }
-            else if(songRemoved){
-                player.playlist[index - 1] = player.playlist[index];
-                player.playlist[index] = undefined;
-            }
-        }
-        --player.playlistSize;
-        console.log('Song has been removed');
+        })
+        .catch(error => {
+            console.error('Fetch Error1', error);
+        })
     }
-
-    if(player.playlistSize === 0){
-        audioSource.src = "#";
-        document.getElementById("playPause").innerHTML="&#x23F5";
-        updatePlayText();
+    catch(error){
+        console.error('Fetching Error2:', error);
     }
 };
 
 // DOM updates
 function updateDOM(){
 
-    for(index = 0; index < 6; index++){
-        let currSong = undefined;
-        switch(index){
+    let dj = document.getElementById("djTag").innerHTML;
+    try{
+        const response = fetch('/getUpdate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                djOwner: dj
+            }),
 
-            case 0:
-                currSong = document.getElementById("song1");
-                break;
-            case 1:
-                currSong = document.getElementById("song2");
-                break;
-            case 2:
-                currSong = document.getElementById("song3");
-                break;
-            case 3:
-                currSong = document.getElementById("song4");
-                break;
-            case 4:
-                currSong = document.getElementById("song5");
-                break;
-            case 5:
-                currSong = document.getElementById("song6");
-                break;
-            default:
-                break;
-        }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Server Response', data);
 
-        if(player.playlist[index] === undefined){
-            currSong.innerHTML = "Add Song";
-        }
-        else{
-            currSong.innerHTML = player.playlist[index].title + " - " + player.playlist[index].artist;
-        }
+            if(data.success){
+                let playlist = data.playlist.songs;
+                document.getElementById('song1').innerHTML = playlist[0] ? (playlist[0].title + ' - ' + playlist[0].artist) : 'Add song';
+                document.getElementById('song2').innerHTML = playlist[1] ? (playlist[1].title + ' - ' + playlist[1].artist) : 'Add song';
+                document.getElementById('song3').innerHTML = playlist[2] ? (playlist[2].title + ' - ' + playlist[2].artist) : 'Add song';
+                document.getElementById('song4').innerHTML = playlist[3] ? (playlist[3].title + ' - ' + playlist[3].artist) : 'Add song';
+                document.getElementById('song5').innerHTML = playlist[4] ? (playlist[4].title + ' - ' + playlist[4].artist) : 'Add song';
+                document.getElementById('song6').innerHTML = playlist[5] ? (playlist[5].title + ' - ' + playlist[5].artist) : 'Add song';
+
+            }     
+        })
+        .catch(error => {
+            console.error('Fetch Error1', error);
+        })
     }
-    
+    catch(error){
+        console.error('Fetching Error2:', error);
+    }
 };
 
 
@@ -175,6 +152,7 @@ addCancel.addEventListener("click",function(event){
 function addValidate(){
     var songName = document.getElementById("addSong");
 
+    
     if(songName.value.trim() == ""){
         alert('Must not leave the form blank');
         return false
@@ -187,6 +165,8 @@ function addValidate(){
         songName.value='';
         return false;
     }
+
+    
 }
 
 // Remove Buttons
@@ -225,110 +205,212 @@ function remValidate(){
 
 var audioPlay = document.getElementById("audio");
 var audioSource = document.getElementById("audioSource");
-var globalPlaylist = player.playlist
 
 function updatePlayText(){
 
-    var playText = document.getElementById("currPlaying");
-    var playlist = player.playlist;
+    let dj = document.getElementById("djTag").innerHTML;
+    try{
+        const response = fetch('/getUpdate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                djOwner: dj
+            }),
 
-    if(player.playlistSize === 0){
-        playText.innerHTML = "Now Playing: ";
-        return 0;
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Server Response', data);
+
+            if(data.success){
+                const playlist = data.playlist.songs;
+                var playText = document.getElementById("currPlaying");
+
+                if(data.playlist.totalSongs <= 0){
+                    playText.innerHTML = "Now Playing: ";
+                    return 0;
+                }
+            
+                var currTitle = playlist[currSong].title;
+                var currArtist = playlist[currSong].artist;
+            
+                playText.innerHTML = "Now Playing: " + currTitle + " - " + currArtist;
+            }     
+        })
+        .catch(error => {
+            console.error('Fetch Error1', error);
+        })
+    }
+    catch(error){
+        console.error('Fetching Error2:', error);
     }
 
-    var currTitle = playlist[player.currSong].title;
-    var currArtist = playlist[player.currSong].artist;
 
-    playText.innerHTML = "Now Playing: " + currTitle + " - " + currArtist;
 }
 
 function playPause(){
 
-    var playlistIndex = player.currSong;
+    let dj = document.getElementById("djTag").innerHTML;
+    try{
+        const response = fetch('/getUpdate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                djOwner: dj
+            }),
 
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Server Response', data);
 
-    if(player.playlistSize <= 0){
-        alert('There are currently no songs in the playlist to play');
-        return 0;
+            if(data.success){
+
+                const playlist = data.playlist.songs;
+                const totalSongs = data.playlist.totalSongs;
+
+                if(totalSongs <= 0){
+                    alert('There are currently no songs in the playlist to play');
+                    return 0;
+                }
+
+                if(audioSource.getAttribute('src') === "#"){
+                    audioSource.src = playlist[currSong].songSrc;
+                    audioPlay.load();
+                    updatePlayText();
+                }
+            
+                if(audioPlay.paused){
+                    audioPlay.play();
+                    document.getElementById("playPause").innerHTML="&#x23F8";
+                }
+                else{
+                    audioPlay.pause();
+                    document.getElementById("playPause").innerHTML="&#x23F5";
+                }
+            }     
+        })
+        .catch(error => {
+            console.error('Fetch Error1', error);
+        })
     }
-
-    if(audioSource.getAttribute('src') === "#"){
-        audioSource.src = player.playlist[playlistIndex].src;
-        audioPlay.load();
-        updatePlayText();
-    }
-
-    if(audioPlay.paused){
-        audioPlay.play();
-        document.getElementById("playPause").innerHTML="&#x23F8";
-    }
-    else{
-        audioPlay.pause();
-        document.getElementById("playPause").innerHTML="&#x23F5";
+    catch(error){
+        console.error('Fetching Error2:', error);
     }
 }
 
 function playNext(){
+    
+    let dj = document.getElementById("djTag").innerHTML;
+    try{
+        const response = fetch('/getUpdate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                djOwner: dj
+            }),
 
-    var playlistIndex = player.currSong;
-    var playlistSize = player.playlistSize;
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Server Response', data);
 
-    if(playlistSize === 0){
-        alert('No songs found in the current playlist');
-        return 0;
+            if(data.success){
+
+                const playlist = data.playlist.songs;
+                var playlistIndex = currSong;
+
+                if(data.playlist.totalSongs <= 0){
+                    alert('No songs found in the current playlist');
+                    return 0;
+                }
+            
+                if(data.playlist.totalSongs == (currSong + 1)){
+                    currSong = 0;
+                }
+                else{
+                    ++currSong;
+                }
+            
+                audioSource.src = playlist[currSong].songSrc;
+            
+                if(!audioPlay.paused){
+                    audioPlay.load();
+                    updatePlayText();
+                    audioPlay.play();
+                }
+                else{
+                    audioPlay.load();
+                    updatePlayText();
+                }
+            }     
+        })
+        .catch(error => {
+            console.error('Fetch Error1', error);
+        })
     }
-
-    if(playlistSize === (playlistIndex + 1)){
-        player.currSong = 0;
-        playlistIndex = 0;
-    }
-    else{
-        ++player.currSong;
-        ++playlistIndex;
-    }
-
-    audioSource.src = player.playlist[playlistIndex].src;
-
-    if(!audioPlay.paused){
-        audioPlay.load();
-        updatePlayText();
-        audioPlay.play();
-    }
-    else{
-        audioPlay.load();
-        updatePlayText();
+    catch(error){
+        console.error('Fetching Error2:', error);
     }
 }
 
 function playLast(){
 
-    var playlistIndex = player.currSong;
-    var playlistSize = player.playlistSize;
+    let dj = document.getElementById("djTag").innerHTML;
+    try{
+        const response = fetch('/getUpdate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                djOwner: dj
+            }),
 
-    if(playlistSize === 0){
-        alert('No songs found in the current playlist');
-        return 0;
-    }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Server Response', data);
 
-    if(playlistIndex === 0){
-        player.currSong = playlistSize - 1;
-        playlistIndex = player.currSong;
-    }
-    else{
-        --player.currSong;
-        --playlistIndex;
-    }
+            if(data.success){
+                const playlist = data.playlist.songs;
 
-    audioSource.src = player.playlist[playlistIndex].src;
-
-    if(!audioPlay.paused){
-        audioPlay.load();
-        updatePlayText();
-        audioPlay.play();
+                if(data.playlist.totalSongs <= 0){
+                    alert('No songs found in the current playlist');
+                    return 0;
+                }
+            
+                if(currSong == 0){
+                    currSong = data.playlist.totalSongs - 1;
+                }
+                else{
+                    --currSong;
+                }
+            
+                audioSource.src = playlist[currSong].songSrc;
+            
+                if(!audioPlay.paused){
+                    audioPlay.load();
+                    updatePlayText();
+                    audioPlay.play();
+                }
+                else{
+                    audioPlay.load();
+                }
+            }     
+        })
+        .catch(error => {
+            console.error('Fetch Error1', error);
+        })
     }
-    else{
-        audioPlay.load();
+    catch(error){
+        console.error('Fetching Error2:', error);
     }
 }
 
